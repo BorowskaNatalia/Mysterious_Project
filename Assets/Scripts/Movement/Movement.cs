@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviour
+public class Movement : MonoBehaviour
 {
     [SerializeField] Rigidbody rb;
     [SerializeField] GameObject head;
@@ -17,12 +16,12 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        Move();
-        Look();
-        Turn();
+        PlayerMove();
+        HeadLook();
+        BodyTurn();
     }
 
-    void Move()
+    void PlayerMove()
     {
         moveInput.x = Input.GetAxis("Horizontal");
         moveInput.y = Input.GetAxis("Vertical");
@@ -30,13 +29,13 @@ public class PlayerMovement : MonoBehaviour
         rb.transform.Translate(new Vector3(moveInput.x, 0, moveInput.y) * movementSpeed * Time.deltaTime);
     }
 
-    void Turn()
+    void BodyTurn()
     {
         lookInput.x = Input.GetAxis("Mouse X");
         rb.transform.Rotate(new Vector3(0, lookInput.x, 0) * sensitivity * Time.deltaTime);
     }
 
-    void Look()
+    void HeadLook()
     {
         lookInput.y = Input.GetAxis("Mouse Y");
         head.transform.Rotate(new Vector3(-lookInput.y, 0, 0) * sensitivity * Time.deltaTime);
