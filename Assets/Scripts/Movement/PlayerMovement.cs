@@ -3,52 +3,43 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] float movementSpeed = 5f;
     [SerializeField] Rigidbody rb;
-
-    [Tooltip("Reference to a Vector2 'Move' action in the Input Actions asset. If empty, legacy Input.GetAxis is used as fallback.")]
-    [SerializeField] InputActionReference moveAction;
-
-    Vector3 movement;
+    [SerializeField] GameObject head;
+    [SerializeField] float movementSpeed = 10f;
+    [SerializeField] float sensitivity = 200f;
     Vector2 moveInput;
+    Vector2 lookInput;
 
-    void OnEnable()
+    void Start()
     {
-        if (moveAction != null && moveAction.action != null)
-            moveAction.action.Enable();
-    }
-
-    void OnDisable()
-    {
-        if (moveAction != null && moveAction.action != null)
-            moveAction.action.Disable();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
     {
-        // Read input from new Input System if available, otherwise fallback to legacy Input
-        if (moveAction != null && moveAction.action != null)
-        {
-            moveInput = moveAction.action.ReadValue<Vector2>();
-        }
-        else
-        {
-            moveInput.x = Input.GetAxis("Horizontal");
-            moveInput.y = Input.GetAxis("Vertical");
-        }
-
-        movement = new Vector3(moveInput.x, 0f, moveInput.y);
+        Move();
+        Look();
+        Turn();
     }
 
-    void FixedUpdate()
+    void Move()
     {
-        if (rb == null)
-        {
-            Debug.LogWarning("PlayerMovement: Rigidbody reference is missing.");
-            return;
-        }
+        moveInput.x = Input.GetAxis("Horizontal");
+        moveInput.y = Input.GetAxis("Vertical");
 
-        Vector3 delta = movement * movementSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + delta);
+        rb.transform.Translate(new Vector3(moveInput.x, 0, moveInput.y) * movementSpeed * Time.deltaTime);
     }
+
+    void Turn()
+    {
+        lookInput.x = Input.GetAxis("Mouse X");
+        rb.transform.Rotate(new Vector3(0, lookInput.x, 0) * sensitivity * Time.deltaTime);
+    }
+
+    void Look()
+    {
+        lookInput.y = Input.GetAxis("Mouse Y");
+        head.transform.Rotate(new Vector3(-lookInput.y, 0, 0) * sensitivity * Time.deltaTime);
+    }
+
 }
